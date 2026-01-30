@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite School Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Plus Jakarta Sans', sans-serif; } </style>
+</head>
+<body class="bg-slate-950 flex items-center justify-center min-h-screen p-4 overflow-hidden relative">
+    <div class="absolute top-0 -left-20 w-72 h-72 bg-indigo-600 rounded-full blur-[120px] opacity-30"></div>
+    <div class="absolute bottom-0 -right-20 w-72 h-72 bg-emerald-600 rounded-full blur-[120px] opacity-30"></div>
+
+    <div class="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-10 w-full max-w-md shadow-2xl relative z-10">
+        <div class="text-center mb-10">
+            <div class="inline-block p-4 bg-gradient-to-tr from-indigo-500 to-emerald-400 rounded-2xl mb-4 shadow-lg shadow-indigo-500/20">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+            </div>
+            <h1 class="text-3xl font-extrabold text-white tracking-tight">Digital Campus</h1>
+            <p class="text-slate-400 mt-2">Nursery to Class 8th</p>
+        </div>
+
+        <div class="space-y-5">
+            <input type="password" id="accessCode" placeholder="Enter ID or Admin Code" 
+                   class="w-full bg-white/5 border border-white/10 p-4 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition text-center text-lg">
+            
+            <button onclick="handleEntry()" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold py-4 rounded-2xl hover:brightness-110 active:scale-95 transition shadow-xl shadow-indigo-500/20">
+                Enter Dashboard
+            </button>
+        </div>
+        <p id="errorMsg" class="text-rose-400 text-center mt-4 hidden animate-pulse font-medium text-sm">Access Denied: Invalid Code</p>
+    </div>
+
+    <script>
+        function handleEntry() {
+            const code = document.getElementById('accessCode').value.trim();
+            if (code === "admin123") { window.location.href = "admin.html"; return; }
+            const r = parseInt(code);
+            let cls = "";
+            if (r >= 1 && r <= 50) cls = "Nursery";
+            else if (r >= 51 && r <= 450) cls = "Class " + Math.ceil((r-50)/50);
+            if (cls !== "") { localStorage.setItem("userClass", cls); window.location.href = "dashboard.html"; }
+            else { document.getElementById('errorMsg').classList.remove('hidden'); }
+        }
+    </script>
+</body>
+</html>

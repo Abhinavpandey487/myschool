@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard | MySchool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style> .card-hover:hover { transform: translateY(-10px); } </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-50 border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <span id="headerTitle" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-emerald-500 uppercase tracking-tighter">PORTAL</span>
+            <button onclick="location.href='index.html'" class="bg-rose-50 text-rose-600 px-6 py-2 rounded-full font-bold hover:bg-rose-100 transition">Logout</button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-8">
+        <header class="mb-12">
+            <h2 class="text-4xl font-extrabold text-slate-900 tracking-tight">Let's start learning!</h2>
+            <p class="text-slate-500 mt-2 text-lg">Select your subject and dive into lectures or tests.</p>
+        </header>
+
+        <div id="subjectGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Retrieve class from login; default to Nursery for safety
+            const userClass = localStorage.getItem('userClass') || "Nursery";
+            document.getElementById('headerTitle').innerText = userClass + " Portal";
+
+            // 1. Define Subject Sets based on your instructions
+            const nurserySubjects = [
+                { name: "Mathematics", icon: "🔢", color: "indigo" },
+                { name: "English", icon: "📚", color: "amber" },
+                { name: "Hindi", icon: "✍️", color: "rose" },
+                { name: "Poem", icon: "🎵", color: "violet" }
+            ];
+
+            const seniorSubjects = [
+                { name: "Mathematics", icon: "🔢", color: "indigo" },
+                { name: "English", icon: "📚", color: "amber" },
+                { name: "Hindi", icon: "✍️", color: "rose" },
+                { name: "Science", icon: "🧪", color: "blue" },
+                { name: "SST", icon: "🌍", color: "emerald" },
+                { name: "GK", icon: "💡", color: "orange" },
+                { name: "Computer", icon: "💻", color: "cyan" },
+                { name: "Art", icon: "🎨", color: "pink" }
+            ];
+
+            // 2. Determine which list to display
+            const subjects = (userClass === "Nursery") ? nurserySubjects : seniorSubjects;
+
+            // 3. Inject HTML into the grid container
+            const grid = document.getElementById('subjectGrid');
+            grid.innerHTML = subjects.map(sub => `
+                <div class="bg-white p-8 rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 card-hover transition-all duration-300">
+                    <div class="w-14 h-14 bg-${sub.color}-50 rounded-2xl flex items-center justify-center text-3xl mb-6">${sub.icon}</div>
+                    <h3 class="text-2xl font-bold text-slate-800">${sub.name}</h3>
+                    <p class="text-slate-500 mt-2 mb-8 text-sm italic">Unlock your potential in ${sub.name}.</p>
+                    <div class="flex flex-col gap-3">
+                        <button onclick="view('${sub.name}', 'lecture')" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold hover:bg-indigo-600 transition">Watch Lectures</button>
+                        <button onclick="view('${sub.name}', 'test')" class="w-full bg-emerald-50 text-emerald-600 py-4 rounded-2xl font-bold hover:bg-emerald-100 transition">Attempt Test</button>
+                    </div>
+                </div>
+            `).join('');
+        });
+
+        function view(sub, type) {
+            localStorage.setItem('selectedSubject', sub);
+            window.location.href = (type === 'lecture') ? "lectures.html" : "test.html";
+        }
+    </script>
+</body>
+</html>

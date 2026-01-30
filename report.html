@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Activity Report | MySchool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-slate-50 min-h-screen p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-3xl font-black text-slate-900 italic">STUDENT ACTIVITY</h1>
+                <p class="text-slate-500">Real-time watch history logs</p>
+            </div>
+            <button onclick="history.back()" class="bg-white border px-6 py-2 rounded-2xl font-bold shadow-sm hover:bg-slate-100 transition">Back to Admin</button>
+        </div>
+
+        <div class="bg-white rounded-[2.5rem] shadow-xl border border-slate-100 overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-900 text-white">
+                        <th class="p-6">Student Name</th>
+                        <th class="p-6">Class</th>
+                        <th class="p-6">Video Subject</th>
+                        <th class="p-6">Watch Date</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTableBody" class="text-slate-700">
+                    </tbody>
+            </table>
+            <div id="loading" class="text-center py-20 font-bold text-slate-400">Loading activity logs...</div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAu4leyXmPdesojF-1i394KAuprQTfx9L8",
+            authDomain: "myschool-9ac84.firebaseapp.com",
+            projectId: "myschool-9ac84",
+            storageBucket: "myschool-9ac84.firebasestorage.app",
+            messagingSenderId: "285739940891",
+            appId: "1:285739940891:web:3ef4a5113a9824b4d90cbe",
+            measurementId: "G-QDXQH775B3"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Fetch Watch History
+        db.collection("watchHistory")
+            .orderBy("watchedAt", "desc")
+            .get().then((querySnapshot) => {
+                document.getElementById('loading').classList.add('hidden');
+                const tbody = document.getElementById('reportTableBody');
+
+                querySnapshot.forEach(doc => {
+                    const data = doc.data();
+                    const date = data.watchedAt ? data.watchedAt.toDate().toLocaleString() : "Just now";
+                    
+                    tbody.innerHTML += `
+                        <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
+                            <td class="p-6 font-bold text-slate-900">${data.studentName}</td>
+                            <td class="p-6"><span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-black uppercase">${data.className}</span></td>
+                            <td class="p-6 font-medium text-slate-600">${data.videoTitle}</td>
+                            <td class="p-6 text-sm text-slate-400">${date}</td>
+                        </tr>
+                    `;
+                });
+            }).catch(err => {
+                console.error(err);
+                document.getElementById('loading').innerText = "Error loading report. Check Firestore Rules.";
+            });
+    </script>
+</body>
+</html>

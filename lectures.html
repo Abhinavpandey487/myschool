@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Watch Lectures | MySchool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-slate-900 text-white p-4 min-h-screen">
+    <div class="max-w-4xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <button onclick="history.back()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl transition font-bold">← Back</button>
+            <h1 id="title" class="text-xl font-bold text-indigo-400 italic">Loading Lecture...</h1>
+        </div>
+
+        <div id="videoArea" class="hidden">
+            <div class="aspect-video w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-800">
+                <iframe id="player" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <div class="mt-6 p-6 bg-slate-800 rounded-3xl border border-slate-700">
+                <h2 class="text-lg font-bold text-white mb-2">Lecture Details</h2>
+                <p class="text-slate-400 text-sm">Watching history is being recorded automatically for your teacher's records.</p>
+            </div>
+        </div>
+
+        <div id="noData" class="hidden text-center py-20 text-slate-500">
+            <p class="text-6xl mb-6">📭</p>
+            <h2 class="text-xl font-bold text-slate-300">No lectures found!</h2>
+            <p class="mt-2">The teacher hasn't posted a video for this subject yet.</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAu4leyXmPdesojF-1i394KAuprQTfx9L8",
+            authDomain: "myschool-9ac84.firebaseapp.com",
+            projectId: "myschool-9ac84",
+            storageBucket: "myschool-9ac84.firebasestorage.app",
+            messagingSenderId: "285739940891",
+            appId: "1:285739940891:web:3ef4a5113a9824b4d90cbe",
+            measurementId: "G-QDXQH775B3"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // 2. Local Context
+        const userClass = localStorage.getItem('userClass');
+        const selectedSub = localStorage.getItem('selectedSubject');
+        document.getElementById('title').innerText = selectedSub + " - " + userClass;
+
+        // 3. Function to record watch history
+        async function recordWatchHistory(videoTitle, videoId) {
+            const studentName = localStorage.getItem("userName") || "Guest Student"; 
+            const uClass = localStorage.getItem("userClass") || "N/A";
+
+            const historyData = {
+                studentName: studentName,
+                className: uClass,
+                videoTitle: videoTitle,
+                videoId: videoId,
+                watchedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                // Saves record to the 'watchHistory' collection
+                await db.collection("watchHistory").add(historyData);
+                console.log("✅ Watch history updated for: " + studentName);
+            } catch (error) {
+                console.error("❌ Error recording history:", error);
+            }
+        }
+
+        // 4. Fetch Video Data & Trigger Log
+        db.collection("schoolData")
+            .where("cls", "==", userClass)
+            .where("sub", "==", selectedSub)
+            .onSnapshot((snapshot) => {
+                if (snapshot.empty) {
+                    document.getElementById('noData').classList.remove('hidden');
+                    document.getElementById('videoArea').classList.add('hidden');
+                } else {
+                    // Always displays the most recently uploaded lecture
+                    const doc = snapshot.docs[snapshot.docs.length - 1];
+                    const data = doc.data();
+                    
+                    if (data.vid) {
+                        document.getElementById('player').src = "https://www.youtube.com/embed/" + data.vid;
+                        document.getElementById('videoArea').classList.remove('hidden');
+                        document.getElementById('noData').classList.add('hidden');
+
+                        // AUTOMATIC RECORDING CALL
+                        recordWatchHistory(selectedSub + " Lecture", data.vid);
+                    }
+                }
+            });
+    </script>
+</body>
+</html>
